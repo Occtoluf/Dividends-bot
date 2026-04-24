@@ -1,0 +1,10 @@
+from aiogram import Router
+
+from src.bot.handlers import alias_pick, dividends
+
+
+def build_router() -> Router:
+    router = Router(name="root")
+    router.include_router(dividends.router)
+    router.include_router(alias_pick.router)
+    return router
