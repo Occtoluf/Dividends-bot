@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from tinkoff.invest import InstrumentStatus
+from t_tech.invest import InstrumentStatus
 
 from src.storage import cache_dividends, cache_instruments
 from src.storage.cache_dividends import ScheduledDividend

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tinkoff.invest import AccountStatus, AccountType
+from t_tech.invest import AccountStatus, AccountType
 
 from src.tbank.client import services
 

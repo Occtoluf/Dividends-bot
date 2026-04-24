@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 
-from tinkoff.invest import OperationState, OperationType
+from t_tech.invest import OperationState, OperationType
 
 from src.storage import cursor_store
 from src.storage.cursor_store import CachedOperation

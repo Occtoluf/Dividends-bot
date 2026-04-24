@@ -3,8 +3,8 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from tinkoff.invest import AsyncClient
-from tinkoff.invest.services import AsyncServices
+from t_tech.invest import AsyncClient
+from t_tech.invest.services import AsyncServices
 
 from src.config import settings
 

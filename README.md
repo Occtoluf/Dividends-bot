@@ -45,9 +45,19 @@ cp .env.example .env
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -r requirements.txt
+pip install -e ".[dev]"   # опционально: подтягивает pytest для тестов
 python run.py
 ```
+
+> SDK T-Bank `t-tech-investments` лежит не на публичном PyPI, а в приватном
+> индексе Т-Банка. В `requirements.txt` первая строка уже прописывает
+> `--extra-index-url https://opensource.tbank.ru/api/v4/projects/238/packages/pypi/simple`,
+> так что обычный `pip install -r requirements.txt` сам его подтянет.
+> Если ставите через `pip install -e .`, флаг нужно передать вручную:
+> ```bash
+> pip install -e ".[dev]" --extra-index-url https://opensource.tbank.ru/api/v4/projects/238/packages/pypi/simple
+> ```
 
 ### Docker Compose (рекомендуется для VPS)
 ```bash
@@ -71,6 +81,7 @@ Dividends-bot/
 ├── Dockerfile              # Multi-stage билд на python:3.12-slim
 ├── docker-compose.yml      # Volume data:/app/data, лимиты ресурсов
 ├── pyproject.toml          # Зависимости и dev-extras для pytest
+├── requirements.txt        # То же + --extra-index-url на T-Bank SDK
 ├── data/                   # (gitignored) SQLite и кэш живут здесь
 └── src/
     ├── config.py           # pydantic Settings: токены, whitelist, пути
@@ -83,7 +94,7 @@ Dividends-bot/
     │   └── handlers/
     │       ├── dividends.py    # /start, /dividends
     │       └── alias_pick.py   # Обработчик inline-кнопок выбора
-    ├── tbank/              # Обёртки поверх tinkoff-investments SDK
+    ├── tbank/              # Обёртки поверх T-Bank Invest SDK (пакет t-tech-investments)
     │   ├── client.py           # Фабрика AsyncClient + helpers по Quotation/Money
     │   ├── accounts.py         # list_accounts() — БС + ИИС
     │   ├── instruments.py      # Кэш справочника акций, будущие дивиденды
