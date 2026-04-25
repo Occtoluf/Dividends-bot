@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from t_tech.invest import AsyncClient
-from t_tech.invest.services import AsyncServices
+from t_tech.invest.async_services import AsyncServices
 
 from src.config import settings
 

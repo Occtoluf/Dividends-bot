@@ -42,6 +42,28 @@ CREATE TABLE IF NOT EXISTS dividend_schedule_cache (
     PRIMARY KEY (figi, record_date)
 );
 
+CREATE TABLE IF NOT EXISTS bond_catalog (
+    figi           TEXT PRIMARY KEY,
+    ticker         TEXT NOT NULL,
+    name           TEXT NOT NULL,
+    currency       TEXT,
+    lot            INTEGER,
+    nominal        REAL,
+    maturity_date  TEXT,
+    updated_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_bond_catalog_ticker ON bond_catalog(ticker);
+
+CREATE TABLE IF NOT EXISTS coupon_schedule_cache (
+    figi          TEXT NOT NULL,
+    coupon_date   TEXT NOT NULL,
+    fix_date      TEXT,
+    pay_one_bond  REAL NOT NULL,
+    currency      TEXT,
+    fetched_at    TEXT NOT NULL,
+    PRIMARY KEY (figi, coupon_date)
+);
+
 CREATE TABLE IF NOT EXISTS operations_cursor (
     account_id TEXT NOT NULL,
     figi       TEXT NOT NULL DEFAULT '',

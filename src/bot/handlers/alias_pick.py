@@ -6,9 +6,9 @@ from aiogram import Router, html
 from aiogram.types import CallbackQuery
 
 from src.bot import formatters, pending_queries
-from src.bot.report_service import build_report_for_share
+from src.bot.report_service import build_report_for_bond, build_report_for_share
 from src.search.normalize import normalize
-from src.storage import aliases, cache_instruments
+from src.storage import aliases, cache_bonds, cache_instruments
 from src.tbank import instruments, operations
 from src.tbank.accounts import list_accounts
 
@@ -41,6 +41,38 @@ async def pick(call: CallbackQuery) -> None:
         report = await build_report_for_share(share.figi, future)
     except Exception as exc:  # noqa: BLE001
         log.exception("Failed to build report for %s", share.ticker)
+        await call.message.answer(f"Не удалось собрать отчёт: {html.quote(str(exc))}")
+        return
+
+    await call.message.answer(formatters.render_report(report), parse_mode="HTML")
+
+
+@router.callback_query(lambda c: c.data and c.data.startswith("pickb:"))
+async def pick_bond(call: CallbackQuery) -> None:
+    assert call.data is not None
+    _, figi, qhash = call.data.split(":", 2)
+    query = pending_queries.get(qhash)
+
+    if query:
+        await aliases.upsert(normalize(query), figi)
+
+    bond = await cache_bonds.get_by_figi(figi)
+    if bond is None:
+        await call.answer("Облигация не найдена")
+        return
+
+    await call.answer(f"Запомнил: {bond.ticker}")
+    if call.message is None:
+        return
+
+    try:
+        accounts = await list_accounts()
+        await operations.ensure_coupon_backfill([a.id for a in accounts])
+        await operations.sync_accounts([a.id for a in accounts])
+        future = await instruments.get_future_coupons(bond.figi)
+        report = await build_report_for_bond(bond.figi, future)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Failed to build coupon report for %s", bond.ticker)
         await call.message.answer(f"Не удалось собрать отчёт: {html.quote(str(exc))}")
         return
 

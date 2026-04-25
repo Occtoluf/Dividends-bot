@@ -63,3 +63,41 @@ def render_suggestions_prompt(query: str) -> str:
 
 def render_not_found(query: str) -> str:
     return f"Ничего похожего на «{query}» не нашёл."
+
+
+def render_totals(
+    title: str,
+    reports: list[AssetReport],
+) -> str:
+    """Сводный отчёт: сумма received + future по всем инструментам, сгруппировано по валюте."""
+    if not reports:
+        return f"<b>{title}</b>\nПока нет данных."
+
+    by_currency: dict[str | None, dict[str, float]] = {}
+    for r in reports:
+        bucket = by_currency.setdefault(r.currency, {"received": 0.0, "future": 0.0})
+        bucket["received"] += r.total_received
+        bucket["future"] += r.future_confirmed
+
+    lines: list[str] = [f"<b>{title}</b>"]
+    for currency, sums in sorted(by_currency.items(), key=lambda kv: (kv[0] or "")):
+        received = _fmt_money(sums["received"], currency)
+        future = _fmt_money(sums["future"], currency)
+        total = _fmt_money(sums["received"] + sums["future"], currency)
+        lines.append(f"Получено: {received}")
+        if sums["future"] > 0:
+            lines.append(f"Будет: +{future}")
+            lines.append(f"Итого: {total}")
+
+    nonzero = [r for r in reports if r.total_received > 0 or r.future_confirmed > 0]
+    nonzero.sort(key=lambda r: r.total_received + r.future_confirmed, reverse=True)
+    if nonzero:
+        lines.append("")
+        for r in nonzero:
+            rec = _fmt_money(r.total_received, r.currency)
+            fut = _fmt_money(r.future_confirmed, r.currency)
+            if r.future_confirmed > 0:
+                lines.append(f"{r.ticker} · {rec} (+{fut})")
+            else:
+                lines.append(f"{r.ticker} · {rec}")
+    return "\n".join(lines)

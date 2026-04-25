@@ -108,6 +108,20 @@ async def load_for_figi(figi: str) -> list[CachedOperation]:
     ]
 
 
+async def list_figis_with_income(income_type: str) -> list[str]:
+    """Возвращает уникальные figi, по которым есть операция income_type в кэше."""
+    async with connect() as conn:
+        cur = await conn.execute(
+            """
+            SELECT DISTINCT figi FROM operations_cache
+            WHERE type = ? AND figi IS NOT NULL AND figi != ''
+            """,
+            (income_type,),
+        )
+        rows = await cur.fetchall()
+    return [r["figi"] for r in rows]
+
+
 async def last_cached_date(account_id: str) -> datetime | None:
     async with connect() as conn:
         cur = await conn.execute(

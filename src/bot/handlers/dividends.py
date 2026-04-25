@@ -20,8 +20,11 @@ router = Router(name="dividends")
 @router.message(CommandStart())
 async def cmd_start(message: Message) -> None:
     await message.answer(
-        "Привет! Команда <b>/dividends &lt;тикер или название&gt;</b> — "
-        "покажу, сколько получено дивидендов и по каким покупкам."
+        "Привет! Доступные команды:\n"
+        "<b>/dividends &lt;тикер&gt;</b> — дивиденды по акции\n"
+        "<b>/coupons &lt;тикер&gt;</b> — купоны по облигации\n"
+        "<b>/total_dividends</b> — сводка по всем дивидендам\n"
+        "<b>/total_coupons</b> — сводка по всем купонам"
     )
 
 
@@ -30,7 +33,7 @@ async def cmd_dividends(message: Message) -> None:
     assert message.text is not None
     parts = message.text.split(maxsplit=1)
     if len(parts) < 2 or not parts[1].strip():
-        await message.answer("Использование: /dividends <тикер или название>")
+        await message.answer("Использование: /dividends &lt;тикер или название&gt;")
         return
     query = parts[1].strip()
 
