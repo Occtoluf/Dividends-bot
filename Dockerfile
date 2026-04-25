@@ -18,10 +18,7 @@ COPY --from=builder /install /usr/local
 COPY src ./src
 COPY run.py ./
 
-RUN useradd --system --uid 1000 app \
-    && mkdir -p /app/data \
-    && chown -R app:app /app
-USER app
+RUN mkdir -p /app/data
 
 VOLUME ["/app/data"]
 CMD ["python", "run.py"]
